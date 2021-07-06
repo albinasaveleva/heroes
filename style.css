@@ -14,6 +14,7 @@ body {
     font-weight: bold;
 }
 .container {
+    position: relative;
     padding: 0 100px;
     display: flex;
     flex-direction: column;
@@ -24,18 +25,22 @@ main {
     margin: 50px;
     padding: 25px;
     padding-bottom: 60px;
+    height: 1150px;
     background: #292C31;
     box-shadow: 10px 10px 80px rgba(0, 0, 0, 0.5);
     border-radius: 32px;
 }
 .filters {
-    padding: 50px 0;
+    padding: 35px 0;
     margin: 0;
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     justify-content: flex-start;
 }
 .filter {
+    display: flex;
+    width: 120px;
+    align-items: flex-start;
     padding: 0;
     list-style: none;
     font-family: Montserrat;
@@ -44,6 +49,7 @@ main {
     font-size: 14px;
     line-height: 17px;
     text-align: center;
+    white-space: pre-wrap;
     color: #FFFFFF;
     cursor: pointer;
 }
@@ -59,10 +65,12 @@ main {
     margin-right: 20px;
 }
 .slider {
-    position: relative;
-    height: 1000px;
+    position: absolute;
+    top: 120px;
+    left: 0;
+    right: 0;
+    height: 990px;
     overflow: hidden;
-    width: 1090px;
 }
 .slider-arrow {
     position: absolute;
@@ -103,13 +111,15 @@ main {
     cursor: pointer;
     position: absolute;
     width: 440px;
-    height: 990px;
+    height: 950px;
     display: flex;
     flex-direction: column;
     opacity: 0;
+    transition: opacity .5s;
 }
 .hero_active {
     opacity: 1;
+    transition: opacity .5s;
 }
 .photo {
     position: absolute;
@@ -123,11 +133,11 @@ main {
 }
 .name {
     position: absolute;
-    top: 35px;
+    top: 25px;
     left: -35px;
     font-family: 'Audiowide', cursive;
-    font-size: 72px;
-    line-height: 94px;
+    font-size: 70px;
+    line-height: 85px;
     letter-spacing: 0.1em;
     color: transparent; /* прозрачный цвет букв */
     -webkit-text-stroke: 2px #FF4656;
@@ -136,7 +146,7 @@ main {
 }
 .citizenship {
     position: absolute;
-    top: 35px;
+    top: 25px;
     left: 50px;
     font-size: 24px;
     line-height: 31px;
@@ -167,10 +177,28 @@ main {
     text-align: right;
     color: #f8f8f8;
     z-index: 10;
+    transition: opacity .5s;
 }
 .hero-description div {
     max-width: 375px;
 }
 .hero-description.visible {
     opacity: 1;
+    transition: opacity .5s;
+}
+.movies-list {
+    margin: 0;
+    padding: 0;
+    max-width: 375px;
+}
+.movies-list li {
+    list-style: none;
+}
+select {
+    width: 120px;
+    white-space: pre-wrap;
+}
+option {
+    width: 120px;
+    white-space: pre-wrap;
 }

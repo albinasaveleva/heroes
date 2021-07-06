@@ -1,9 +1,9 @@
 'use strict';
 class Heroes {
     constructor() {
+        this.url = './dbHeroes.json';
         this.heroes = document.querySelector('.heroes');
         this.heroesList = [];
-        this.url = './dbHeroes.json';
         this.filter = '';
         this.filterSelect = '';
         this.speciesFilter = new Set();
@@ -21,16 +21,20 @@ class Heroes {
                 return response.json();
             })
             .then((result) => {
+                const addToFilterList = (filterList, obj, key) => {
+                    filterList.add(obj[key].toLowerCase());
+                };
+
                 result.forEach(obj => {
                     for (let key in obj) {
                         if (key === 'species') {
-                            this.speciesFilter.add(obj[key].toLowerCase());
+                            addToFilterList(this.speciesFilter, obj, key);
                         } else if (key === 'citizenship') {
-                            this.citizenshipFilter.add(obj[key].toLowerCase());
+                            addToFilterList(this.citizenshipFilter, obj, key);
                         } else if (key === 'gender') {
-                            this.genderFilter.add(obj[key].toLowerCase());
+                            addToFilterList(this.genderFilter, obj, key);
                         } else if (key === 'status') {
-                            this.statusFilter.add(obj[key].toLowerCase());
+                            addToFilterList(this.statusFilter, obj, key);
                         } else if (key === 'movies') {
                             obj[key].forEach(item => this.moviesFilter.add(item));
                         }
@@ -42,64 +46,26 @@ class Heroes {
             .catch((error) => console.log(error));
     }
     showFilters() {
-        const speciesFilter = () => {
-            const speciesSelect = document.querySelector('#species select');
-            this.speciesFilter.forEach(item => {
+        const getSelect = (selector, filterList) => {
+            const select = document.querySelector(`#${selector} select`);
+
+            filterList.forEach(item => {
                 let option = document.createElement('option');
                 option.value = item;
                 option.textContent = item;
-                speciesSelect.insertAdjacentElement('beforeend', option);
+                select.insertAdjacentElement('beforeend', option);
             });
         };
-        speciesFilter();
 
-        const citizenshipFilter = () => {
-            const citizenshipSelect = document.querySelector('#citizenship select');
-            this.citizenshipFilter.forEach(item => {
-                let option = document.createElement('option');
-                option.value = item;
-                option.textContent = item;
-                citizenshipSelect.insertAdjacentElement('beforeend', option);
-            });
-        };
-        citizenshipFilter();
-
-        const genderFilter = () => {
-            const genderSelect = document.querySelector('#gender select');
-            this.genderFilter.forEach(item => {
-                let option = document.createElement('option');
-                option.value = item;
-                option.textContent = item;
-                genderSelect.insertAdjacentElement('beforeend', option);
-            });
-        };
-        genderFilter();
-
-        const statusFilter = () => {
-            const statusSelect = document.querySelector('#status select');
-            this.statusFilter.forEach(item => {
-                let option = document.createElement('option');
-                option.value = item;
-                option.textContent = item;
-                statusSelect.insertAdjacentElement('beforeend', option);
-            });
-        };
-        statusFilter();
-
-        const moviesFilter = () => {
-            const moviesSelect = document.querySelector('#movies select');
-            this.moviesFilter.forEach(item => {
-                let option = document.createElement('option');
-                option.value = item;
-                option.textContent = item;
-                moviesSelect.insertAdjacentElement('beforeend', option);
-            });
-        };
-        moviesFilter();
-
+        getSelect('species', this.speciesFilter);
+        getSelect('citizenship', this.citizenshipFilter);
+        getSelect('gender', this.genderFilter);
+        getSelect('status', this.statusFilter);
+        getSelect('movies', this.moviesFilter);
     }
     filtering() {
         const filters = document.querySelectorAll('.filter');
+
         filters.forEach(filter => {
             filter.addEventListener('click', (event) => {
                 let target = event.target;
@@ -168,9 +134,11 @@ class Heroes {
         const slider = document.querySelector('.slider'),
             arrowLeft = document.createElement('div'),
             arrowRight = document.createElement('div');
+
         arrowLeft.setAttribute('id', 'arrow-left');
         arrowLeft.classList.add('slider-arrow', 'slider-arrow_left');
         slider.insertAdjacentElement('beforeend', arrowLeft);
+
         arrowRight.setAttribute('id', 'arrow-right');
         arrowRight.classList.add('slider-arrow', 'slider-arrow_right');
         slider.insertAdjacentElement('beforeend', arrowRight);
@@ -178,6 +146,7 @@ class Heroes {
     deleteSliderArrows() {
         const arrowLeft = document.querySelector('.slider-arrow_left'),
             arrowRight = document.querySelector('.slider-arrow_right');
+
         if (arrowLeft && arrowRight) {
             arrowLeft.remove();
             arrowRight.remove();
@@ -185,42 +154,52 @@ class Heroes {
     }
     slider() {
         const arrowLeft = document.querySelector('.slider-arrow_left'),
-            arrowRight = document.querySelector('.slider-arrow_right');
-        const prevSlide = () => {
-            console.log('prev');
+            arrowRight = document.querySelector('.slider-arrow_right'),
+            slides = document.querySelectorAll('.hero');
+        let currentSlide = 0;
+
+        const prevSlide = (elem, index, strClass) => {
+            elem[index].classList.remove(strClass);
         };
-        const nextSlide = () => {
-            console.log('next');
+        const nextSlide = (elem, index, strClass) => {
+            elem[index].classList.add(strClass);
         };
-        arrowLeft.addEventListener('click', prevSlide);
-        arrowRight.addEventListener('click', nextSlide);
+
+        arrowLeft.addEventListener('click', () => {
+            prevSlide(slides, currentSlide, 'hero_active');
+            currentSlide--;
+            if (currentSlide < 0) {
+                currentSlide = slides.length - 1;
+            }  
+            nextSlide(slides, currentSlide, 'hero_active');      
+        });
+        arrowRight.addEventListener('click', () => {
+            prevSlide(slides, currentSlide, 'hero_active');
+            currentSlide++;
+            if (currentSlide >= slides.length) {
+                currentSlide = 0;
+            }
+            nextSlide(slides, currentSlide, 'hero_active');
+        });
 
     }
     showHeroes() {
         this.heroes.textContent = '';
-        if (this.heroesList.length > 1) {
-            this.addSliderArrows();
-            this.slider();
-        } else {
-            this.deleteSliderArrows();
-        }
         this.heroesList.forEach((hero, index) => {
             let heroData = hero;
+
             let heroCard = document.createElement('div');
             heroCard.classList.add('hero');
             if (index === 0) {
                 heroCard.classList.add('hero_active');
             }
+
             let heroDescription = document.createElement('div');
             heroDescription.classList.add('hero-description');
             heroCard.append(heroDescription);
+
             for (let key in heroData) {
-                if (key === 'name') {
-                    let div = document.createElement('div');
-                    div.classList.add(key);
-                    div.textContent = heroData[key];
-                    heroDescription.insertAdjacentElement( 'beforebegin', div);
-                } else if (key === 'citizenship') {
+                if (key === 'name' || key === 'citizenship') {
                     let div = document.createElement('div');
                     div.classList.add(key);
                     div.textContent = heroData[key];
@@ -233,14 +212,17 @@ class Heroes {
                 } else if (key === 'movies') {
                     let moviesList = document.createElement('ul');
                     moviesList.classList.add('movies-list');
+
                     let movie = document.createElement('li');
                         movie.textContent = key;
                         moviesList.append(movie);
+
                     heroData[key].forEach(item => {
                         let movie = document.createElement('li');
                         movie.textContent = item;
                         moviesList.append(movie);
                     });
+
                     heroDescription.append(moviesList);
                 } else {
                     let div = document.createElement('div');
@@ -251,42 +233,46 @@ class Heroes {
             }
             this.heroes.append(heroCard);
         });
+        if (this.heroesList.length > 1) {
+            if (!document.querySelector('.slider-arrow_left') &&
+                !document.querySelector('.slider-arrow_left')) {
+                    this.addSliderArrows();
+                }
+            this.slider();
+        } else {
+            this.deleteSliderArrows();
+        }
+        this.showHeroDescription();
     }
-    listeners() {
+    showHeroDescription() {
+        const doVisible = (target, selector) => {
+            target
+                .parentNode
+                .querySelector(selector)
+                .classList
+                .toggle('visible');
+        };
         document.querySelectorAll('.hero').forEach(hero=> {
             hero.addEventListener('click', event => {
                 let target = event.target;
+                
                 if (target.parentNode.matches('.hero')) {
-                    target
-                        .parentNode
-                        .querySelector('.hero-description')
-                        .classList
-                        .toggle('visible');
+                    doVisible(target, '.hero-description');
                 } else {
                     do {target = target.parentNode;
                         if (target.parentNode.matches('.hero')) {
-                            target
-                                .parentNode
-                                .querySelector('.hero-description')
-                                .classList
-                                .toggle('visible');
+                            doVisible(target, '.hero-description');
                         }
                     } while (!target.matches('.hero'));
                 }
             });
-        })
-        
-        
-    }
-    showHeroDescription(heroCard) {
-        const heroDescription = heroCard.querySelector('.hero-description');
-        heroDescription.classList.toggle('.visible');
+        }); 
     }
     init(startFilter) {
         this.getFilters();
         this.filter = startFilter.textContent;
         this.filterSelect = startFilter.textContent;
-        this.getHeroesList(startFilter.textContent)
+        this.getHeroesList(startFilter.textContent);
     }
 }
 
