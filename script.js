@@ -1,4 +1,5 @@
 'use strict';
+
 class Heroes {
     constructor() {
         this.url = './dbHeroes.json';
