@@ -87,7 +87,11 @@ class Heroes {
                             }
                         });
                     } else {
-                        this.filterSelect = '';
+                        const startFilter = document.querySelector('#all');
+                        this.filter = startFilter.textContent;
+                        this.filterSelect = startFilter.textContent;
+                        this.getHeroesList(startFilter.textContent);
+                        return;
                     }
                 } 
                 this.getHeroesList();
